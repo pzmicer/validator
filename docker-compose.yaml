@@ -1,0 +1,24 @@
+services:  
+  db:
+    image: postgres:14
+    volumes:
+      - ./migrations/2022-07-17-133313_create_tracked_data/up.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+  server:
+    # build: .
+    image: xml-validator:1.0
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+  adminer:
+    image: adminer:4.8.1
+    restart: always
+    ports:
+      - 80:8080
