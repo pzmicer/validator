@@ -21,4 +21,4 @@ The server accepts POST requests at `/data` endpoint with body in XML format. Ba
 ### TODO List
 
 1. Better implementation of migrations
-2. ...
+2. Docker bugs fixing
