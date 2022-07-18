@@ -8,7 +8,7 @@ use actix_web::{middleware::Logger, HttpServer, web, App, post, HttpResponse, er
 use diesel::{r2d2::{ConnectionManager, self}, PgConnection, prelude::*};
 use env_logger::Env;
 use quick_xml::{Reader, events::Event, de::{from_str, DeError}};
-use serde_json::Value;
+use serde_json::{Value, json};
 use models::*;
 
 type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
@@ -57,7 +57,7 @@ async fn send(pool: web::Data<DbPool>, body: String) -> actix_web::Result<HttpRe
         raw_xml: body,
         source_machine: required_data.str_field2,
         validation_ok,
-        validation_error,
+        validation_error: validation_error.clone(),
     };
 
     let _add_entry = web::block(move || {
@@ -72,7 +72,10 @@ async fn send(pool: web::Data<DbPool>, body: String) -> actix_web::Result<HttpRe
     .await?
     .map_err(error::ErrorInternalServerError)?;
 
-    Ok(HttpResponse::Ok().finish())
+    Ok(HttpResponse::Ok().body(json!({
+        "validation_ok": validation_ok,
+        "validation_error": validation_error.unwrap_or("".to_owned())
+    }).to_string()))
 }
 
 fn parse_request(request_str: &str) -> Result<XmlData, DeError> {
