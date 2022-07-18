@@ -11,6 +11,7 @@ services:
     # build: .
     image: xml-validator:1.0
     restart: always
+    # command: tail -f /dev/null
     env_file:
       - .env
     ports:
